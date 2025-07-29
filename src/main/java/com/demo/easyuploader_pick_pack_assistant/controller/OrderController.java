@@ -1,6 +1,6 @@
 package com.demo.easyuploader_pick_pack_assistant.controller;
 
-import com.demo.easyuploader_pick_pack_assistant.controller.response.GetOrderResponse;
+import com.demo.easyuploader_pick_pack_assistant.dto.GetOrderResponse;
 import com.demo.easyuploader_pick_pack_assistant.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +15,9 @@ public class OrderController {
 
     @GetMapping("/orders/{trackingNumber}")
     public ResponseEntity<GetOrderResponse> getOrder(@PathVariable String trackingNumber) {
-        //todo check if order exist in pickpacker table, if not - search EU table and add new order in pickpacker table ELSE throw 404
+
         GetOrderResponse getOrderResponse = orderService.getOrder(trackingNumber);
-        if (getOrderResponse != null) {
+        if (getOrderResponse.items() != null) {
             return ResponseEntity.ok(getOrderResponse);
         }
         return ResponseEntity.notFound().build();

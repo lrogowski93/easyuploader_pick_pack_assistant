@@ -1,4 +1,4 @@
-package com.demo.easyuploader_pick_pack_assistant.controller.response;
+package com.demo.easyuploader_pick_pack_assistant.dto;
 
 import com.demo.easyuploader_pick_pack_assistant.model.OrderItem;
 import lombok.Builder;
@@ -9,10 +9,12 @@ import java.util.List;
 public record GetOrderResponse(
         List<OrderItem> items,
         String trackingNumber,
-        Boolean isCompleted,
+        boolean isCompleted,
         LocalDateTime pickPackStartTime,
         LocalDateTime completionTime,
         String pickPacker,
         String buyerLogin,
-        String orderNotes) {
+        String orderNotes,
+        String giftWrapping
+        ) {
 }

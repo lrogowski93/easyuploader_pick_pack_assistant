@@ -1,25 +1,31 @@
 package com.demo.easyuploader_pick_pack_assistant.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+
+import lombok.*;
 
 @Entity
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Table(name = "PICKPACKER_ORDER_ITEM")
 public class OrderItem {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_item_seq")
+    @SequenceGenerator(name = "order_item_seq", sequenceName = "GEN_ORDER_ITEM_ID", allocationSize = 1)
     private Long id;
-    private Long orderId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    @JsonBackReference
+    private Order order;
     private String model;
     private String name;
     private String barcode;
     private int quantity;
     private String warehouseLocation;
-    private Boolean giftWrapping;
     private String pictureUrl;
-    private String notes;
-    private Boolean isCompleted;
+    private boolean isCompleted;
 }
