@@ -8,7 +8,7 @@ public class OrderDtoMapper {
 
         return GetOrderResponse.builder()
                 .items(order.getOrderItems())
-                .trackingNumber(order.getTrackingNumber())
+                .trackingNumbers(order.getTrackingNumbers())
                 .isCompleted(order.isCompleted())
                 .pickPackStartTime(order.getPickPackStartTime())
                 .completionTime(order.getCompletionTime())

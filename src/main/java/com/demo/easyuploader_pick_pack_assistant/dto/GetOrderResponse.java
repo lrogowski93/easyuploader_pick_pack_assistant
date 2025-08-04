@@ -8,7 +8,7 @@ import java.util.List;
 @Builder
 public record GetOrderResponse(
         List<OrderItem> items,
-        String trackingNumber,
+        List<String> trackingNumbers,
         boolean isCompleted,
         LocalDateTime pickPackStartTime,
         LocalDateTime completionTime,

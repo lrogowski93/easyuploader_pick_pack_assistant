@@ -17,7 +17,7 @@ public class OrderController {
     public ResponseEntity<GetOrderResponse> getOrder(@PathVariable String trackingNumber) {
 
         GetOrderResponse getOrderResponse = orderService.getOrder(trackingNumber);
-        if (getOrderResponse.items() != null) {
+        if (!getOrderResponse.items().isEmpty()) {
             return ResponseEntity.ok(getOrderResponse);
         }
         return ResponseEntity.notFound().build();

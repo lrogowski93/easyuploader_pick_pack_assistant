@@ -38,23 +38,28 @@ public class OrderService {
     }
 
     private Order processOrderFromEU (String trackingNumber){
-        Order order = new Order();
-        order.setTrackingNumber(trackingNumber);
-        Optional<Integer> orderId = getOrderIdFromEU(trackingNumber);
-        if(orderId.isPresent()){
-            order.setId(orderId.get().longValue());
-            order.setUserId(1L); //todo change later to real user
-            order.setBuyerLogin(orderQueryDao.findBuyerLoginByOrderId(orderId.get().longValue()));
-            order.setOrderNotes(orderQueryDao.findOrderNotesByOrderId(orderId.get().longValue()));
-            order.setGiftWrapping(orderQueryDao.findGiftWrappingByOrderId(orderId.get().longValue()));
+        Optional<Integer> orderIdOpt = getOrderIdFromEU(trackingNumber);
+        if (orderIdOpt.isEmpty()) {
+            return new Order();
+        }
+        Long orderId = orderIdOpt.get().longValue();
+        Order order = orderRepository.findById(orderId).orElseGet(() -> {
+            Order newOrder = new Order();
+            newOrder.setId(orderId);
+            newOrder.setUserId(1L); //todo change later to real user
+            newOrder.setBuyerLogin(orderQueryDao.findBuyerLoginByOrderId(orderId));
+            newOrder.setOrderNotes(orderQueryDao.findOrderNotesByOrderId(orderId));
+            newOrder.setGiftWrapping(orderQueryDao.findGiftWrappingByOrderId(orderId));
+            return newOrder;
+        });
+
+        order.addTrackingNumber(trackingNumber);
+
+        if (order.getOrderItems().isEmpty()) {
             orderItemService.fillOrderItemsAndAttachToOrder(order);
-            orderRepository.save(order);
-            return order;
         }
-        else{
-            //todo improve handling of the situation when order is not found in EU db?
-            return order;
-        }
+
+        return orderRepository.save(order);
 
     }
 

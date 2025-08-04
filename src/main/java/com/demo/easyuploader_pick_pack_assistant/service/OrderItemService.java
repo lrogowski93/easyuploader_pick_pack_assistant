@@ -36,9 +36,9 @@ public class OrderItemService {
                     .distinct()
                     .map(model -> OrderItem.builder()
                             .model(model)
-                            .name(getOrderItemName(order.getTrackingNumber(), model))
-                            .barcode(getOrderItemBarcode(order.getTrackingNumber(), model))
-                            .quantity(getOrderItemQuantity(order.getTrackingNumber(), model))
+                            .name(getOrderItemName(order.getTrackingNumbers().get(0), model))
+                            .barcode(getOrderItemBarcode(order.getTrackingNumbers().get(0), model))
+                            .quantity(getOrderItemQuantity(order.getTrackingNumbers().get(0), model))
                             .warehouseLocation(getOrderItemWarehouseLocation(model))
                             .build())
                     .forEach(order::addOrderItem);

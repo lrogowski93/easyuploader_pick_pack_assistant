@@ -17,7 +17,7 @@ public class Order {
     @Id
     private Long id;
     private Long userId;
-    private String trackingNumber;
+    //private String trackingNumber;
     private boolean isCompleted;
     private LocalDateTime pickPackStartTime;
     private LocalDateTime completionTime;
@@ -26,14 +26,21 @@ public class Order {
     private String giftWrapping;
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<OrderItem> orderItems;
+    private List<OrderItem> orderItems = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(name = "PICKPACKER_ORDER_TRACKINGS", joinColumns = @JoinColumn(name = "order_id"))
+    @Column(name = "tracking_number")
+    private List<String> trackingNumbers = new ArrayList<>();
 
     public void addOrderItem(OrderItem item) {
-        if (this.orderItems == null) {
-            this.orderItems = new ArrayList<>();
-        }
         item.setOrder(this);
         this.orderItems.add(item);
     }
 
+    public void addTrackingNumber(String trackingNumber) {
+        if (!this.trackingNumbers.contains(trackingNumber)) {
+            this.trackingNumbers.add(trackingNumber);
+        }
+    }
 }
