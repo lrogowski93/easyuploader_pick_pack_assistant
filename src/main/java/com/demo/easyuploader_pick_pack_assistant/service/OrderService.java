@@ -2,6 +2,7 @@ package com.demo.easyuploader_pick_pack_assistant.service;
 
 import com.demo.easyuploader_pick_pack_assistant.dto.GetOrderResponse;
 import com.demo.easyuploader_pick_pack_assistant.model.Order;
+import com.demo.easyuploader_pick_pack_assistant.model.OrderIdentifier;
 import com.demo.easyuploader_pick_pack_assistant.model.OrderItem;
 import com.demo.easyuploader_pick_pack_assistant.repository.jpa.OrderItemRepository;
 import com.demo.easyuploader_pick_pack_assistant.repository.jpa.OrderRepository;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.*;
 
+
 import static com.demo.easyuploader_pick_pack_assistant.controller.OrderDtoMapper.mapToOrderResponse;
 
 @Service
@@ -23,30 +25,52 @@ public class OrderService {
     private final OrderQueryDao orderQueryDao;
     private final OrderItemService orderItemService;
 
-    public GetOrderResponse getOrder(String trackingNumber) {
-        if (checkIfOrderIsImported(trackingNumber)){
-            return mapToOrderResponse(orderRepository.findByTrackingNumber(trackingNumber));
+
+    public GetOrderResponse getOrder(String input) {
+        OrderIdentifier identifier = OrderIdentifier.of(input);
+
+        if (checkIfOrderIsImported(identifier)){
+            if(identifier.isEuid()) {
+                return mapToOrderResponse(orderRepository.findById(identifier.euIdValue()).orElseThrow());
+            }
+            else{
+                return mapToOrderResponse(orderRepository.findByTrackingNumber(identifier.normalized()));
+            }
         }
         else{
-            Order order = processOrderFromEU(trackingNumber);
+            Order order = processOrderFromEU(identifier);
             return mapToOrderResponse(order);
         }
     }
 
-    private boolean checkIfOrderIsImported(String trackingNumber){
-        return orderRepository.existsByTrackingNumber(trackingNumber);
+
+    private boolean checkIfOrderIsImported(OrderIdentifier identifier){
+        if(identifier.isEuid()){
+            return orderRepository.existsById(identifier.euIdValue());
+        }
+        else {
+            return orderRepository.existsByTrackingNumber(identifier.normalized());
+        }
     }
+
 
     private Optional<Integer> getOrderIdFromEU(String trackingNumber){
         return orderQueryDao.findOrderId(trackingNumber);
     }
 
-    private Order processOrderFromEU (String trackingNumber){
-        Optional<Integer> orderIdOpt = getOrderIdFromEU(trackingNumber);
-        if (orderIdOpt.isEmpty()) {
-            return new Order();
+    private Order processOrderFromEU (OrderIdentifier identifier){
+        Long orderId;
+        if(identifier.isEuid()){
+            orderId = identifier.euIdValue();
         }
-        Long orderId = orderIdOpt.get().longValue();
+        else{
+            Optional<Integer> orderIdOpt = getOrderIdFromEU(identifier.normalized());
+            if (orderIdOpt.isEmpty()) {
+                return new Order();
+            }
+            orderId = orderIdOpt.get().longValue();
+        }
+
         Order order = orderRepository.findById(orderId).orElseGet(() -> {
             Order newOrder = new Order();
             newOrder.setId(orderId);
@@ -56,9 +80,12 @@ public class OrderService {
             newOrder.setGiftWrapping(orderQueryDao.findGiftWrappingByOrderId(orderId));
             return newOrder;
         });
-
-        order.addTrackingNumber(trackingNumber);
-
+        if(identifier.isEuid()) {
+            order.addTrackingNumber(orderQueryDao.findFirstTrackingNumberByOrderId(orderId));
+        }
+        else {
+            order.addTrackingNumber(identifier.normalized());
+        }
         if (order.getOrderItems().isEmpty()) {
             orderItemService.fillOrderItemsAndAttachToOrder(order);
         }

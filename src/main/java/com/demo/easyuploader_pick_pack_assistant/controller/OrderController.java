@@ -1,6 +1,7 @@
 package com.demo.easyuploader_pick_pack_assistant.controller;
 
 import com.demo.easyuploader_pick_pack_assistant.dto.GetOrderResponse;
+import com.demo.easyuploader_pick_pack_assistant.service.OrderItemService;
 import com.demo.easyuploader_pick_pack_assistant.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,15 +14,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
+    private final OrderItemService orderItemService;
 
-    @GetMapping("/orders/{trackingNumber}")
-    public ResponseEntity<GetOrderResponse> getOrder(@PathVariable String trackingNumber) {
+    @GetMapping("/orders/{orderIdentifier}")
+    public ResponseEntity<GetOrderResponse> getOrder(@PathVariable String orderIdentifier) {
 
-        GetOrderResponse getOrderResponse = orderService.getOrder(trackingNumber);
+        GetOrderResponse getOrderResponse = orderService.getOrder(orderIdentifier);
         if (!getOrderResponse.items().isEmpty()) {
             return ResponseEntity.ok(getOrderResponse);
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/orders/items/images/{model}")
+    public ResponseEntity<byte[]> getOrderItemImage(@PathVariable String model) {
+        return orderItemService.getOrderItemImage(model);
     }
 
     @PatchMapping("/orders/items/{orderItemId}/complete")

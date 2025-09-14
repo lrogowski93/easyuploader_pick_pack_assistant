@@ -133,18 +133,50 @@ public class OrderQueryDao {
                 .getSingleResult();
     }
 
-    public String findOrderItemBarcode(String trackingNumber, String model) {
+    public String findOrderItemBarcode(String model) {
         String sql = """
-            SELECT FIRST 1 t.EAN
-            FROM TRANS_WYSYLKA w
-            LEFT JOIN TRANSAKCJE t ON w.ID_TRANS = t.ID
-            WHERE w.NR_NADANIA LIKE '%' || :trackingNumber || '%'
-              AND t.KOD = :model
+            SELECT FIRST 1 Z_EANY
+            FROM AUKCJE WHERE KOD = :model
         """;
         return (String) entityManager
                 .createNativeQuery(sql)
-                .setParameter("trackingNumber", trackingNumber)
                 .setParameter("model", model)
                 .getSingleResult();
+    }
+
+    public String findFirstTrackingNumberByOrderId(Long orderId) {
+        String sql = """
+                SELECT
+                  CASE
+                   WHEN POSITION(',' IN NR_NADANIA) > 0 THEN SUBSTRING(NR_NADANIA FROM 1 FOR POSITION(',' IN NR_NADANIA) - 1)
+                   ELSE NR_NADANIA
+                 END AS first_value
+                FROM TRANS_WYSYLKA WHERE ID_TRANS = :orderId
+                """;
+        return (String) entityManager
+                .createNativeQuery(sql)
+                .setParameter("orderId", orderId)
+                .getSingleResult();
+    }
+
+    public Optional<byte[]> findImage(String model) {
+        String sql = """
+                SELECT ZD_MIN
+                FROM AUK_ZDJECIA
+                WHERE ID_AUKCJI=(
+                  SELECT FIRST 1 ID FROM AUKCJE WHERE KOD = :model
+                )
+                """;
+        try {
+            byte[] result = (byte[]) entityManager
+                    .createNativeQuery(sql)
+                    .setParameter("model", model)
+                    .getSingleResult();
+            return Optional.ofNullable(result);
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
+
+
     }
 }
