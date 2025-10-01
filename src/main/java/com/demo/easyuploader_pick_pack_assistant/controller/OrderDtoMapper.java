@@ -12,7 +12,7 @@ public class OrderDtoMapper {
                 .isCompleted(order.isCompleted())
                 .pickPackStartTime(order.getPickPackStartTime())
                 .completionTime(order.getCompletionTime())
-                .pickPacker("username") //todo retrieve name from db by id
+                .pickPacker(order.getPickPacker().getLogin())
                 .buyerLogin(order.getBuyerLogin())
                 .orderNotes(order.getOrderNotes())
                 .giftWrapping(order.getGiftWrapping())

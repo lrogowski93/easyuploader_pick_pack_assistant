@@ -24,9 +24,10 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final OrderQueryDao orderQueryDao;
     private final OrderItemService orderItemService;
+    private final UserService userService;
 
 
-    public GetOrderResponse getOrder(String input) {
+    public GetOrderResponse getOrder(String input, Long userId) {
         OrderIdentifier identifier = OrderIdentifier.of(input);
 
         if (checkIfOrderIsImported(identifier)){
@@ -38,7 +39,7 @@ public class OrderService {
             }
         }
         else{
-            Order order = processOrderFromEU(identifier);
+            Order order = processOrderFromEU(identifier, userId);
             return mapToOrderResponse(order);
         }
     }
@@ -58,7 +59,7 @@ public class OrderService {
         return orderQueryDao.findOrderId(trackingNumber);
     }
 
-    private Order processOrderFromEU (OrderIdentifier identifier){
+    private Order processOrderFromEU (OrderIdentifier identifier, Long userId){
         Long orderId;
         if(identifier.isEuid()){
             orderId = identifier.euIdValue();
@@ -74,7 +75,7 @@ public class OrderService {
         Order order = orderRepository.findById(orderId).orElseGet(() -> {
             Order newOrder = new Order();
             newOrder.setId(orderId);
-            newOrder.setUserId(1L); //todo change later to real user
+            newOrder.setPickPacker(userService.getUserById(userId));
             newOrder.setBuyerLogin(orderQueryDao.findBuyerLoginByOrderId(orderId));
             newOrder.setOrderNotes(orderQueryDao.findOrderNotesByOrderId(orderId));
             newOrder.setGiftWrapping(orderQueryDao.findGiftWrappingByOrderId(orderId));
@@ -109,6 +110,7 @@ public class OrderService {
             order.setCompletionTime(LocalDateTime.now());
         }
         orderRepository.save(order);
+
         return mapToOrderResponse(order);
     }
 

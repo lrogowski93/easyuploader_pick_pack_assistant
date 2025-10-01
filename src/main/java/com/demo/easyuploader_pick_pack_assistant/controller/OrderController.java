@@ -1,10 +1,12 @@
 package com.demo.easyuploader_pick_pack_assistant.controller;
 
+import com.demo.easyuploader_pick_pack_assistant.dto.AuthenticatedUser;
 import com.demo.easyuploader_pick_pack_assistant.dto.GetOrderResponse;
 import com.demo.easyuploader_pick_pack_assistant.service.OrderItemService;
 import com.demo.easyuploader_pick_pack_assistant.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,9 +19,8 @@ public class OrderController {
     private final OrderItemService orderItemService;
 
     @GetMapping("/orders/{orderIdentifier}")
-    public ResponseEntity<GetOrderResponse> getOrder(@PathVariable String orderIdentifier) {
-
-        GetOrderResponse getOrderResponse = orderService.getOrder(orderIdentifier);
+    public ResponseEntity<GetOrderResponse> getOrder(@PathVariable String orderIdentifier, @AuthenticationPrincipal AuthenticatedUser user) {
+        GetOrderResponse getOrderResponse = orderService.getOrder(orderIdentifier, user.id());
         if (!getOrderResponse.items().isEmpty()) {
             return ResponseEntity.ok(getOrderResponse);
         }
@@ -33,7 +34,6 @@ public class OrderController {
 
     @PatchMapping("/orders/items/{orderItemId}/complete")
     public ResponseEntity<GetOrderResponse> markOrderItemAsCompleted(@PathVariable Long orderItemId) {
-
         GetOrderResponse getOrderResponse = orderService.markOrderItemAsCompleted(orderItemId);
         return ResponseEntity.ok(getOrderResponse);
     }

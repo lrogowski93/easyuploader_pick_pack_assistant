@@ -16,8 +16,9 @@ import java.util.List;
 public class Order {
     @Id
     private Long id;
-    private Long userId;
-    //private String trackingNumber;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_ID")
+    private User pickPacker;
     private boolean isCompleted;
     private LocalDateTime pickPackStartTime;
     private LocalDateTime completionTime;
