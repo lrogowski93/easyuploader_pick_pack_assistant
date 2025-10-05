@@ -82,7 +82,7 @@ public class OrderQueryDao {
 
     public String findBuyerLoginByOrderId(long orderId) {
         String sql = """
-            SELECT k.KL_LOGIN
+            SELECT FIRST 1 k.KL_LOGIN
             FROM TRANSAKCJE t
             LEFT JOIN TRANS_KLIENCI k ON t.ID_KLIENT = k.ID_KLIENT
             WHERE t.ID = :orderId
