@@ -28,12 +28,17 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login").permitAll()
+                        .requestMatchers(
+                                "/",
+                                "/index.html",
+                                "/static/**",
+                                "/css/**", "/js/**", "/images/**",
+                                "/auth/login",
+                                "/auth/logout"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
-                .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(unauthorizedEntryPoint())
-                )
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedEntryPoint()))
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
                 .build();
