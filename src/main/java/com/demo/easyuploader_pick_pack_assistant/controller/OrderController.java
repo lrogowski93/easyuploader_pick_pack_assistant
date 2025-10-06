@@ -7,10 +7,7 @@ import com.demo.easyuploader_pick_pack_assistant.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,9 +15,9 @@ public class OrderController {
     private final OrderService orderService;
     private final OrderItemService orderItemService;
 
-    @GetMapping("/orders/{orderIdentifier}")
-    public ResponseEntity<GetOrderResponse> getOrder(@PathVariable String orderIdentifier, @AuthenticationPrincipal AuthenticatedUser user) {
-        GetOrderResponse getOrderResponse = orderService.getOrder(orderIdentifier, user.id());
+    @GetMapping("/orders")
+    public ResponseEntity<GetOrderResponse> getOrder(@RequestParam String identifier, @AuthenticationPrincipal AuthenticatedUser user) {
+        GetOrderResponse getOrderResponse = orderService.getOrder(identifier, user.id());
         if (!getOrderResponse.items().isEmpty()) {
             return ResponseEntity.ok(getOrderResponse);
         }
