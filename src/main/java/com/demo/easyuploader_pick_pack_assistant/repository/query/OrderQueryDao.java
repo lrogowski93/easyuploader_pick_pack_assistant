@@ -15,11 +15,11 @@ public class OrderQueryDao {
 
     public Optional<Integer> findOrderId(String trackingNumber) {
         String sql = """
-            SELECT FIRST 1 ID_TRANS
-            FROM TRANS_WYSYLKA
-            WHERE NR_NADANIA LIKE '%' || :trackingNumber || '%'
-              AND ID_TRANS IN (SELECT ID FROM TRANSAKCJE WHERE GRUPA_UKRYJ = 0)
-            ORDER BY DATA_WYSYLKI DESC
+            SELECT FIRST 1 t.ID_TRANS
+            FROM TRANS_WYSYLKA t
+            WHERE (',' || REPLACE(t.NR_NADANIA, ' ', '') || ',') LIKE '%,' || :trackingNumber || ',%'
+              AND t.ID_TRANS IN (SELECT ID FROM TRANSAKCJE WHERE GRUPA_UKRYJ = 0)
+            ORDER BY t.DATA_WYSYLKI DESC
         """;
         try {
             Integer result = (Integer) entityManager
@@ -70,7 +70,7 @@ public class OrderQueryDao {
             SELECT SUM(t.ILOSC)
             FROM TRANS_WYSYLKA w
             LEFT JOIN TRANSAKCJE t ON w.ID_TRANS = t.ID
-            WHERE w.NR_NADANIA LIKE '%' || :trackingNumber || '%'
+            WHERE (',' || REPLACE(w.NR_NADANIA, ' ', '') || ',') LIKE '%,' || :trackingNumber || ',%'
               AND t.KOD = :model
         """;
         return ((Number) entityManager
@@ -123,7 +123,7 @@ public class OrderQueryDao {
             SELECT FIRST 1 t.TYTUL_AUKCJI
             FROM TRANS_WYSYLKA w
             LEFT JOIN TRANSAKCJE t ON w.ID_TRANS = t.ID
-            WHERE w.NR_NADANIA LIKE '%' || :trackingNumber || '%'
+            WHERE (',' || REPLACE(w.NR_NADANIA, ' ', '') || ',') LIKE '%,' || :trackingNumber || ',%'
               AND t.KOD = :model
         """;
         return (String) entityManager
