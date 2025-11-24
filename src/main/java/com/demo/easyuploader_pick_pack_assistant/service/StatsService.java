@@ -5,14 +5,10 @@ import com.demo.easyuploader_pick_pack_assistant.model.Order;
 import com.demo.easyuploader_pick_pack_assistant.model.User;
 import com.demo.easyuploader_pick_pack_assistant.repository.jpa.OrderRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -64,7 +60,6 @@ public class StatsService {
 
 
         return allPickPackers.stream()
-
                 .map(user -> {
                         return getUserStats(user.getId(), startDate, endDate);
                 })
