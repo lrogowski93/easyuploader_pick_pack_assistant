@@ -6,6 +6,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("""
@@ -21,4 +24,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     WHERE tn = :trackingNumber
 """)
     boolean existsByTrackingNumber(@Param("trackingNumber") String trackingNumber);
+
+    List<Order> findAllByPickPackerIdAndIsCompletedTrueAndCompletionTimeBetween(
+            Long pickPackerId,
+            LocalDateTime startDate,
+            LocalDateTime endDate
+    );
 }

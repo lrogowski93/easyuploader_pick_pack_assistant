@@ -6,6 +6,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -15,5 +17,13 @@ public class UserService {
     public User getUserById(Long userId){
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
+    }
+    public String getUserLoginById(Long userId) {
+        return userRepository.findLoginById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+    }
+
+    public List<User> findAllPickPackers() {
+        return userRepository.findAll();
     }
 }
