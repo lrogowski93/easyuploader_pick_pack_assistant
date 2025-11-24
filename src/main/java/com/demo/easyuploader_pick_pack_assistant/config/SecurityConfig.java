@@ -36,6 +36,7 @@ public class SecurityConfig {
                                 "/auth/login",
                                 "/auth/logout"
                         ).permitAll()
+                        .requestMatchers("/stats/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedEntryPoint()))

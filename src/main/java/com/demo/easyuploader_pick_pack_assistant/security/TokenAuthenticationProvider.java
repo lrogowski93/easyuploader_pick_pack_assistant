@@ -25,7 +25,8 @@ public class TokenAuthenticationProvider implements AuthenticationProvider {
                 .map(user -> {
                     AuthenticatedUser authenticatedUser = new AuthenticatedUser(
                             user.getId(),
-                            user.getLogin()
+                            user.getLogin(),
+                            user.getUserRole()
                     );
 
                     return new UsernamePasswordAuthenticationToken(
