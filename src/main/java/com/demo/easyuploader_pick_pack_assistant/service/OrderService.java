@@ -79,6 +79,7 @@ public class OrderService {
             newOrder.setBuyerLogin(orderQueryDao.findBuyerLoginByOrderId(orderId));
             newOrder.setOrderNotes(orderQueryDao.findOrderNotesByOrderId(orderId));
             newOrder.setGiftWrapping(orderQueryDao.findGiftWrappingByOrderId(orderId));
+            newOrder.setPickPackStartTime(LocalDateTime.now());
             return newOrder;
         });
         if(identifier.isEuid()) {
@@ -102,9 +103,7 @@ public class OrderService {
         item.setCompleted(true);
 
         Order order = item.getOrder();
-        if (order.getPickPackStartTime() == null) {
-            order.setPickPackStartTime(LocalDateTime.now());
-        }
+
         if(order.getCompletionTime() == null && checkIfAllOrderItemsAreCompleted(order)){
             order.setCompleted(true);
             order.setCompletionTime(LocalDateTime.now());
