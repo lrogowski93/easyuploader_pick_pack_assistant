@@ -179,4 +179,23 @@ public class OrderQueryDao {
 
 
     }
+
+    public boolean findIsLargeSizeByOrderId(Long orderId) {
+        String sql = """
+                SELECT NOTATKI
+                FROM TRANS_WIADOM
+                WHERE ID_TRANS= :orderId
+                """;
+        try {
+            Object result = entityManager
+                    .createNativeQuery(sql)
+                    .setParameter("orderId", orderId)
+                    .getSingleResult();
+
+            return "G".equals(result);
+
+        } catch (NoResultException e) {
+            return false;
+        }
+    }
 }

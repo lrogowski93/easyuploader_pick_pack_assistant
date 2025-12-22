@@ -5,6 +5,7 @@ import lombok.Builder;
 import java.time.Duration;
 @Builder
 public record GetUserStatsResponse(
+        Long userId,
         String login,
         int completedOrdersCount,
         Duration totalPackingTime,

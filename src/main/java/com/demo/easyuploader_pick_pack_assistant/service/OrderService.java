@@ -80,6 +80,7 @@ public class OrderService {
             newOrder.setOrderNotes(orderQueryDao.findOrderNotesByOrderId(orderId));
             newOrder.setGiftWrapping(orderQueryDao.findGiftWrappingByOrderId(orderId));
             newOrder.setPickPackStartTime(LocalDateTime.now());
+            newOrder.setLargeSizeOrder(orderQueryDao.findIsLargeSizeByOrderId(orderId));
             return newOrder;
         });
         if(identifier.isEuid()) {
@@ -91,6 +92,7 @@ public class OrderService {
         if (order.getOrderItems().isEmpty()) {
             orderItemService.fillOrderItemsAndAttachToOrder(order);
         }
+
 
         return orderRepository.save(order);
 

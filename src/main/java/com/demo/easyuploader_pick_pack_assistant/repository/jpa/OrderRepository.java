@@ -1,6 +1,7 @@
 package com.demo.easyuploader_pick_pack_assistant.repository.jpa;
 
 import com.demo.easyuploader_pick_pack_assistant.model.Order;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -29,5 +30,19 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             Long pickPackerId,
             LocalDateTime startDate,
             LocalDateTime endDate
+    );
+
+    List<Order> findAllByPickPackerIdAndIsCompletedTrueAndCompletionTimeBetween(
+            Long pickPackerId,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            Pageable page
+    );
+
+    List<Order> findAllByPickPackerIdAndIsCompletedTrueAndCompletionTimeBetweenAndLargeSizeOrderTrue(
+            Long pickPackerId,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            Pageable page
     );
 }

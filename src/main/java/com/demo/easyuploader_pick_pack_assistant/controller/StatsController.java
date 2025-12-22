@@ -1,8 +1,12 @@
 package com.demo.easyuploader_pick_pack_assistant.controller;
 
+import com.demo.easyuploader_pick_pack_assistant.dto.GetUserDetailedStatsResponse;
 import com.demo.easyuploader_pick_pack_assistant.dto.GetUserStatsResponse;
 import com.demo.easyuploader_pick_pack_assistant.service.StatsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +24,15 @@ public class StatsController {
                                                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
                                                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
         return ResponseEntity.ok(statsService.getUserStats(userId, startDate, endDate));
+    }
+
+    @GetMapping("/stats/{userId}/details")
+    public ResponseEntity<List<GetUserDetailedStatsResponse>> getUserDetailedStats(@PathVariable Long userId,
+                                                                                   @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+                                                                                   @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+                                                                                   @RequestParam boolean largeSizeOrder,
+                                                                                   @PageableDefault(size = 50, sort = "completionTime", direction = Sort.Direction.DESC) Pageable page) {
+        return ResponseEntity.ok(statsService.getUserDetailedStats(userId, startDate, endDate, largeSizeOrder, page));
     }
 
     @GetMapping("/stats")

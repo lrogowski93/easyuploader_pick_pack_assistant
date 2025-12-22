@@ -1,15 +1,20 @@
 package com.demo.easyuploader_pick_pack_assistant.service;
 
+import com.demo.easyuploader_pick_pack_assistant.dto.GetUserDetailedStatsResponse;
 import com.demo.easyuploader_pick_pack_assistant.dto.GetUserStatsResponse;
 import com.demo.easyuploader_pick_pack_assistant.model.Order;
 import com.demo.easyuploader_pick_pack_assistant.model.User;
 import com.demo.easyuploader_pick_pack_assistant.repository.jpa.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.demo.easyuploader_pick_pack_assistant.controller.UserStatsDtoMapper.mapToDetailedStats;
+
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +51,7 @@ public class StatsService {
         }
 
         return  GetUserStatsResponse.builder()
+                .userId(userId)
                 .login(userService.getUserLoginById(userId))
                 .completedOrdersCount(completedOrdersCount)
                 .totalPackingTime(totalPackingDuration)
@@ -64,6 +70,20 @@ public class StatsService {
                         return getUserStats(user.getId(), startDate, endDate);
                 })
                 .collect(Collectors.toList());
+    }
+
+    public List<GetUserDetailedStatsResponse> getUserDetailedStats(Long userId, LocalDateTime startDate, LocalDateTime endDate, boolean largeSizeOrder, Pageable page) {
+        List<Order> orders;
+        String pickPackerLogin = userService.getUserLoginById(userId);
+
+        if (largeSizeOrder) {
+            orders = orderRepository.findAllByPickPackerIdAndIsCompletedTrueAndCompletionTimeBetweenAndLargeSizeOrderTrue(userId, startDate, endDate, page);
+        } else {
+            orders = orderRepository.findAllByPickPackerIdAndIsCompletedTrueAndCompletionTimeBetween(userId, startDate, endDate, page);
+        }
+
+        return orders.stream().map(order -> mapToDetailedStats(order, userId, pickPackerLogin))
+                .toList();
     }
 
     }

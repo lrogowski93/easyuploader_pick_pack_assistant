@@ -25,6 +25,7 @@ public class Order {
     private String buyerLogin;
     private String orderNotes;
     private String giftWrapping;
+    private boolean largeSizeOrder;
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<OrderItem> orderItems = new ArrayList<>();
